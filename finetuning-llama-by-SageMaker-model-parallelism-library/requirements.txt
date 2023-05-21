@@ -1,0 +1,6 @@
+transformers @ git+https://github.com/huggingface/transformers.git@97a3d16a6941294d7d76d24f36f26617d224278e
+datasets==2.10.1
+evaluate==0.4.0
+ninja
+rouge-score
+sentencepiece
