@@ -14,9 +14,8 @@ Use the two different methods (deepspeed and SageMaker model parallelism/SMP lib
 * The training speed between bf16 mixed precision training and fp16 mixed precision training is similar.
 * The training loss between deepspeed zero stage 1 and zero stage 3 is similar.
 * The warmup step is very helpful for the convergence of the training loss, it is useful both for deepspeed training and SMP training.
-* For my experiments and my datasets, when special new token such as [STOP] and [SEP] are added into the dataset, if both input embedding matrix and output embedding matrix are resized and are initialized by the mean pooling of others tokens’ embedding in corresponding embedding matrix (just like what the alpaca performs), the training procedure is unstable.
+* For my experiments and my datasets, when special new token such as [STOP] and [SEP] are added into the dataset, if both input embedding matrix and output embedding matrix are resized and are initialized by the mean pooling of others tokens’ embedding in corresponding embedding matrix (just like what the alpaca performs), the training procedure is unstable. Also, the convergence speed of train loss is slower than that of random initialization of the new tokens’ input embedding and output embedding.
 * Deepspeed inference integrated by Large Model Inference/LMI container can support bf16 model, but the open source deepspeed inference does not support bf16 model (refer to:  https://github.com/microsoft/DeepSpeed/issues/2954 ).
 * For text generation,  the main part of generation time results from the length of new generation tokens.
-* 
 
 
