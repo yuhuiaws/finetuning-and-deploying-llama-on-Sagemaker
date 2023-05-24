@@ -10,7 +10,7 @@ Use the two different methods (deepspeed and SageMaker model parallelism/SMP lib
 
 ## Tips:
 * S5cmd should be used to download model and upload model in the training procedure, which will save much time.
-* We should choose bf16 not fp16 for training LLM on A100 GPU, because bf16 has better training stability and convergence than fp16.
+* According my experiments, We should choose bf16 not fp16 for training LLM on A100 GPU, because bf16 has better training stability and convergence than fp16 (refer to: https://www.reddit.com/r/MachineLearning/comments/vndtn8/d_mixed_precision_training_difference_between/).
 * The training speed between bf16 mixed precision training and fp16 mixed precision training is similar.
 * The training loss between deepspeed zero stage 1 and zero stage 3 is similar.
 * The warmup step is very helpful for the convergence of the training loss, it is useful both for deepspeed training and SMP training.
