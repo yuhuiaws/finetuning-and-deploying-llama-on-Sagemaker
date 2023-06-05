@@ -19,9 +19,8 @@ Use the two different methods (deepspeed and SageMaker model parallelism/SMP lib
 * For text generation,  the length of input tokens is larger, the generation time is longer;the length of new generation tokens is larger, the generation time is longer; the main part of generation time results from the length of new generation tokens.
 * When using HF pipeline API, batch inference/generation for pipeline API may increase or decrease the performance, which is up to the specific model, hardware, input tokens and output new tokens  (refer to https://huggingface.co/docs/transformers/main_classes/pipelines ). Also, from our experiments, for llama 7B fp16 model on g5.48xlarge:
 
-      a. When input tokens is short such as 10,  the performance is better when setting the batch_size of pipeline API to be more than 1 (because the latency just becomes large a little and throughput is improved more).
-      
-      b. When input tokens is long such as 750,  the performance will become worse when setting the batch_size of pipeline API to be more than 1 (because the latency becomes very large compared with that of batch size 1).
+      When input tokens is short such as 10,  the performance is better when setting the batch_size of pipeline API to be more than 1 (because the latency just becomes large a little and throughput is improved more).
+      When input tokens is long such as 750,  the performance will become worse when setting the batch_size of pipeline API to be more than 1 (because the latency becomes very large compared with that of batch size 1).
 
 So please test the performance case by case when configuring the batch_size parameter of HF pipeline API.
 
