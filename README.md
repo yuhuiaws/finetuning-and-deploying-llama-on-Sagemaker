@@ -16,6 +16,22 @@ Use the two different methods (deepspeed and SageMaker model parallelism/SMP lib
 * The warmup step is very helpful for the convergence of the training loss, it is useful both for deepspeed training and SMP training.
 * For my experiments and my datasets, when special new token such as [STOP] and [SEP] are added into the dataset, if both input embedding matrix and output embedding matrix are resized and are initialized by the mean pooling of others tokens’ embedding in corresponding embedding matrix (just like what the alpaca performs), the training procedure is unstable. Also, the convergence speed of train loss is slower than that of random initialization of the new tokens’ input embedding and output embedding.
 * Deepspeed inference integrated by Large Model Inference/LMI container can support bf16 model, but the open source deepspeed inference does not support bf16 model (refer to:  https://github.com/microsoft/DeepSpeed/issues/2954 ).
-* For text generation,  the main part of generation time results from the length of new generation tokens.
+* For text generation,  the length of input tokens is larger, the generation time is longer;the length of new generation tokens is larger, the generation time is longer; the main part of generation time results from the length of new generation tokens.
+* When using HF pipeline API, batch inference/generation for pipeline API may increase or decrease the performance, which is up to the specific model, hardware, input tokens and output new tokens  (refer to https://huggingface.co/docs/transformers/main_classes/pipelines ). Also, from our experiments, for llama 7B fp16 model on g5.48xlarge:
+
+      a. When input tokens is short such as 10,  the performance is better when setting the batch_size of pipeline API to be more than 1 (because the latency just becomes large a little and throughput is improved more).
+      
+      b. When input tokens is long such as 750,  the performance will become worse when setting the batch_size of pipeline API to be more than 1 (because the latency becomes very large compared with that of batch size 1).
+
+So please test the performance case by case when configuring the batch_size parameter of HF pipeline API.
+
+* For 7B/6B LLM fp16 model, g5.2xlarge has better performance-price ratio than g4dn.2xlarge.
+* For 7B/6B LLM fp16/bf16 model, single GPU is better choice than multiple GPUs TP/PP. 
+* If you want to deploy bf16 model on GPU instance, you should choose A10g or A100 instance (which is  Ampere architecture).
+* You should trade off the performance and price when serving LLM model.  For the specific model size, 
+
+    * Firstly you could evaluate whether single GPU can serve it. 
+    * If not, you will choose multiple GPUs TP/PP.  Try fastertransformer first, then deepspped, finally HF accelerate. Just test the performance for the minimum number of GPUs as the start point.
+
 
 
