@@ -5,8 +5,39 @@ Use the two different methods (deepspeed and SageMaker model parallelism/SMP lib
 ## There is four parts in this repo:
 1. Prepare dataset: You can use the prepare-data-for-llama.ipynb and open source dataset such as dialy-dialogue.txt.zip to prepare dataset for llama.
 2. Deploy fine tuned llama on SageMkaer: We use Large Model Inference/LMI container to deploy llama on SageMaker. Also, the demo code can perform the server side batch in order to improve the throughput. (The code is suitable for the case which is single sample/prompt per client request)
-3. Fine tune llama by deepspeed on SageMaker multiple nodes: We use deepspeed and torch.distributed.launch to fine tune llama. 
-4. Fine tune llama by SMP on SageMaker multiple nodes: We use SMP+HF trainer API to fine tune the llama, which is code zero intrusion.
+3. Fine tune llama by deepspeed on SageMaker multiple nodes: We use deepspeed and torch.distributed.launch to fine tune llama.
+
+   Maybe the built-in SageMaker Huggingface training container had some changes, it will result in the  failure about deepspeed training on SageMaker. The workaroud is as following:
+   
+   a. Change the requirements.txt as following:
+   
+            transformers==4.28.1
+            datasets
+            sentencepiece
+            accelerate
+            evaluate
+            deepspeed==0.9.2
+            ninja
+            rouge-score
+            bitsandbytes
+   
+   b. Change SageMaker huggingface training container to SageMaker pytorch 1.12 training container:
+
+       from sagemaker.pytorch import PyTorch
+       estimator = PyTorch(entry_point='start.py',
+                    source_dir           = '.', 
+                    instance_type='ml.p4d.24xlarge',
+                    instance_count=2,
+                    role=role,
+                    base_job_name = job_name, 
+                    keep_alive_period_in_seconds=1800,
+                    framework_version='1.12.0',
+                    py_version='py38',
+                    environment = environment,
+                    disable_profiler=True,
+                    debugger_hook_config=False)
+   
+5. Fine tune llama by SMP on SageMaker multiple nodes: We use SMP+HF trainer API to fine tune the llama, which is code zero intrusion.
 
 ## Tips:
 * S5cmd should be used to download model and upload model in the training procedure, which will save much time.
